@@ -1,0 +1,13 @@
+# node modules
+/client/node_modules
+
+# testing
+/client/tests/
+/server/tests/
+
+# environment variables
+/client/.env
+/server/.env
+
+# production
+/client/build
