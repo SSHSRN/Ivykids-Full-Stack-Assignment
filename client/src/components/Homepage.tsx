@@ -1,7 +1,92 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+// Search for: #SSHSRNTODO
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Homepage = () => {
+    const [showSignupModal, setShowSignupModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    const openSignupModal = () => {
+        setShowSignupModal(true);
+    };
+
+    const openLoginModal = () => {
+        setShowLoginModal(true);
+    }
+
+
+    const closeSignupModal = () => {
+        setShowSignupModal(false);
+    };
+
+    const closeLoginModal = () => {
+        setShowLoginModal(false);
+    };
+
+    const handleSignUp = () => {
+        const name = (document.getElementById('signUpName') as HTMLInputElement).value;
+        const username = (document.getElementById('signUpUsername') as HTMLInputElement).value;
+        const email = (document.getElementById('signUpEmail') as HTMLInputElement).value;
+        const password = (document.getElementById('signUpPassword') as HTMLInputElement).value;
+        const confirmPassword = (document.getElementById('signUpConfirmPassword') as HTMLInputElement).value;
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+        // Check if all fields are filled and valid
+        if (password ==='' || confirmPassword === '' || username === '' || name === '' || email === '') {
+            alert('All fields must be filled');
+            return;
+        }
+        if (password.length < 8) {
+            alert('Password must be at least 8 characters');
+            return;
+        }
+        if (username.length < 4 || username.length > 15) {
+            alert('Username must be between 4 and 15 characters');
+            return;
+        }
+        if (name.length < 1 || name.length > 50) {
+            alert('Name must be between 1 and 50 characters');
+            return;
+        }
+        if (email.length < 1 || email.length > 50) {
+            alert('Email must be between 1 and 50 characters');
+            return;
+        }
+        if (email.indexOf('@') === -1) {
+            alert('Email must be valid');
+            return;
+        }
+        const data = { name, username, email, password };
+        console.log(data);
+        // Send data to server, validate and create account #SSHSRNTODO
+    }
+
+    const handleLogin = () => {
+        const username = (document.getElementById('loginUsername') as HTMLInputElement).value;
+        const password = (document.getElementById('loginPassword') as HTMLInputElement).value;
+        // Check if all fields are filled and valid
+        if (password ==='' || username === '') {
+            alert('All fields must be filled');
+            return;
+        }
+        if (password.length < 8) {
+            alert('Password must be at least 8 characters');
+            return;
+        }
+        if (username.length < 4 || username.length > 15) {
+            alert('Username must be between 4 and 15 characters');
+            return;
+        }
+        const data = { username, password };
+        console.log(data);
+        // Send data to server, validate and log in #SSHSRNTODO
+    }
+
     return (
         <div className='home'>
             <div className='homePageLogo'>
@@ -11,11 +96,67 @@ const Homepage = () => {
             <div className='homePageContent'>
                 <h1 className='homePageTitle'>Happening now</h1>
                 <h2 className='homePageSub'>Join today.</h2>
-                <button className='homePageSignUp'>Create Account</button>
+                <button className='homePageSignUp' onClick={openSignupModal}>Create Account</button>
                 <p className='homePageTerms'>By signing up, you agree to the <Link className='link' to='https://twitter.com/tos'>Terms of Service</Link> and <Link className='link' to='https://twitter.com/privacy'>Privacy Policy</Link>, including <Link className='link' to='https://help.twitter.com/rules-and-policies/twitter-cookies'>Cookie Use</Link>.</p>
                 <p className='homePageLoginText'><strong>Already have an account?</strong></p>
-                <button className='homePageLogIn'>Sign in</button>
+                <button className='homePageLogIn' onClick={openLoginModal}>Log in</button>
             </div>
+            {showSignupModal && (
+                <div className="modal fade show signUp" tabIndex={-1} role="dialog" style={{ display: "block" }}>
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content" style={{ backgroundColor: "black" }}>
+                            <div className="modal-header" style={{ backgroundColor: "black", border: "1px solid gray" }}>
+                                <h5 className="modal-title">Create your account</h5>
+                                <button
+                                    type="button"
+                                    className="close"
+                                    onClick={closeSignupModal}
+                                >
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body text-center" style={{ backgroundColor: "black", border: "1px solid gray" }}>
+                                <input className='modalInput bg-black textInput' type='text' id='signUpName' placeholder='Name' /><br />
+                                <input className='modalInput bg-black textInput' type='text' id='signUpUsername' placeholder='Username' /><br />
+                                <input className='modalInput bg-black textInput' type='text' id='signUpEmail' placeholder='Email' /><br />
+                                <input className='modalInput bg-black textInput' type='password' id='signUpPassword' placeholder='Password' /><br />
+                                <input className='modalInput bg-black textInput' type='password' id='signUpConfirmPassword' placeholder='Confirm Password' /><br />
+                                <button className='modalInput signUpButton' onClick={handleSignUp}>Sign Up</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showSignupModal && (
+                <div className="modal-backdrop fade show"></div>
+            )}
+
+            {showLoginModal && (
+                <div className="modal fade show signUp" tabIndex={-1} role="dialog" style={{ display: "block" }}>
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content" style={{ backgroundColor: "black" }}>
+                            <div className="modal-header" style={{ backgroundColor: "black", border: "1px solid gray" }}>
+                                <h5 className="modal-title">Log in to Twitter</h5>
+                                <button
+                                    type="button"
+                                    className="close"
+                                    onClick={closeLoginModal}
+                                >
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body text-center" style={{ backgroundColor: "black", border: "1px solid gray" }}>
+                                <input className='modalInput bg-black textInput' type='text' id='loginUsername' placeholder='Username' /><br />
+                                <input className='modalInput bg-black textInput' type='password' id='loginPassword' placeholder='Password' /><br />
+                                <button className='modalInput signUpButton' onClick={handleLogin}>Log in</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showLoginModal && (
+                <div className="modal-backdrop fade show"></div>
+            )}
         </div>
     )
 }

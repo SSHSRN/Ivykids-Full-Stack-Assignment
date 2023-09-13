@@ -93,3 +93,28 @@
   align-items: center;
   cursor: pointer;
 }
+
+.textInput {
+  width: 90%;
+  height: 55px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  font-size: 15px;
+  padding-left: 20px;
+  margin-top: 20px;
+}
+
+.signUpButton {
+  width: 90%;
+  height: 55px;
+  border-radius: 50px;
+  background-color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: black;
+  font-weight: bold;
+  font-size: 20px;
+  padding-left: 20px;
+  margin-top: 20px;
+}
