@@ -118,3 +118,41 @@
   padding-left: 20px;
   margin-top: 20px;
 }
+
+/* Profile page styles */
+
+.nav-link {
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+
+.inactive {
+  cursor: pointer;
+  color: white !important;
+}
+
+.active {
+  cursor: default;
+}
+
+.followersFollowingLink {
+  color: white !important;
+  font-size: 15px !important;
+  text-decoration: none;
+}
+
+.align-bottom {
+  margin-top: 50vh !important;
+}
+
+.tweetCard {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  background-color: rgb(21, 24, 28) !important;
+  color: white !important;
+  padding: 20px;
+  margin-bottom: 20px;
+}
