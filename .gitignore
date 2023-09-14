@@ -1,5 +1,6 @@
 # node modules
 /client/node_modules
+/server/node_modules
 
 # testing
 /client/tests/
