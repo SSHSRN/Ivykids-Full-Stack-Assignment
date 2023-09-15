@@ -30,9 +30,20 @@ const UserProfilePage = () => {
             url: ''
         }
     }]);
+    const [timelinePosts, setTimelinePosts] = useState([{
+        id: 0,
+        content: '',
+        timestamp: '',
+        deletable: false,
+        media: {
+            type: '',
+            url: ''
+        },
+        username: '',
+        name: '',
+    }]);
     const [activeTab, setActiveTab] = useState('posts');
     const [nInitialPosts, setNInitialPosts] = useState(posts.length);
-    const [followingUsers, setFollowingUsers] = useState(['']);
     const [followingThisUser, setFollowingThisUser] = useState(false);
     const [currUser, setCurrUser] = useState('');
     const [currUserDisplayName, setCurrUserDisplayName] = useState('');
@@ -48,19 +59,12 @@ const UserProfilePage = () => {
             }
             else {
                 const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/verify', { token });
-                console.log(response.data);
                 if (response.data.message === 'Valid token') {
                     setCurrUser(response.data.user.username);
                     setCurrUserDisplayName(response.data.user.name);
-                    console.log("This user follows these peeps:");
-                    console.log(response.data.user.following);
-                    setFollowingUsers(response.data.user.following);
-                    console.log("followingUsers: " + followingUsers);
 
                     if (response.data.user.username === window.location.pathname.split('/')[2]) {
-                        console.log("You are visiting your own profile.");
                         setSelfProfile(true);
-                        console.log(response.data.user);
                         setUser(response.data.user);
                         // map user's tweets to posts in the order of most recent first
                         const posts = response.data.user.tweets.map((tweet: any) => {
@@ -74,9 +78,28 @@ const UserProfilePage = () => {
                         }).reverse();
                         setPosts(posts);
                         setNInitialPosts(posts.length + 1);
+                        // get timeline tweets of the user
+                        const timelineResponse = await axios.get(process.env.REACT_APP_SERVER_URL + '/application/timeline', {
+                            params: {
+                                username: response.data.user.username,
+                                token: token
+                            }
+                        });
+                        console.log(timelineResponse.data);
+                        const timelinePosts = timelineResponse.data.tweets.map((tweet: any) => {
+                            return {
+                                id: tweet.tweetId,
+                                content: tweet.content,
+                                timestamp: new Date(tweet.date).toLocaleString(),
+                                deletable: false,
+                                media: tweet.media,
+                                user: tweet.user,
+                                name: tweet.name
+                            }
+                        }).reverse();
+                        setTimelinePosts(timelinePosts);
                     }
                     else if (response.data.user.username !== window.location.pathname.split('/')[2]) {
-                        console.log("You are visiting someone else's profile.");
                         setSelfProfile(false);
                         const response1 = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/getuser', { user_name: window.location.pathname.split('/')[2], token: token });
                         setNumFollowers(response1.data.user.followersCount);
@@ -110,17 +133,6 @@ const UserProfilePage = () => {
         };
         checkLoggedIn();
     }, []);
-
-
-    const initialTimelineTweets = [
-        { id: 1, content: 'A tweet from followed user 1.', timestamp: '3 hours ago' },
-        { id: 2, content: 'A tweet from followed user 2 with an image.', timestamp: '5 hours ago', media: { type: 'image', url: 'https://example.com/image1.jpg' } },
-        { id: 3, content: 'A tweet from followed user 3 with a video.', timestamp: '6 hours ago', media: { type: 'video', url: 'https://example.com/video1.mp4' } },
-        { id: 4, content: 'A tweet from followed user 4.', timestamp: '7 hours ago' },
-        { id: 5, content: 'A tweet from followed user 5 with an image.', timestamp: '8 hours ago', media: { type: 'image', url: 'https://example.com/image2.jpg' } },
-    ];
-
-    const [timelineTweets] = useState(initialTimelineTweets);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -194,7 +206,7 @@ const UserProfilePage = () => {
         else if (activeTab === 'timeline') {
             return (
                 <div>
-                    {timelineTweets.map((tweet) => (
+                    {timelinePosts.map((tweet) => (
                         <div key={tweet.id} className="card mb-3 tweetCard">
                             <div className="card-body">
                                 <p className="card-text">{tweet.content}</p>
@@ -208,7 +220,7 @@ const UserProfilePage = () => {
                                         )}
                                     </div>
                                 )}
-                                <p className="card-text text-muted text-white-50">Posted on {tweet.timestamp}</p>
+                                <p className="card-text text-muted text-white-50">Posted on {tweet.timestamp} by <Link to={`/user/${tweet.username}`} style={{ textDecoration: 'none', color: 'white' }}>{tweet.name}</Link></p>
                             </div>
                         </div>
                     ))}
@@ -253,7 +265,6 @@ const UserProfilePage = () => {
 
     const handleLogout = async () => {
         if (window.confirm('Are you sure you want to log out?')) {
-            console.log('Logging out...');
             const logoutResponse = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/logout', { username: user.username });
             console.log(logoutResponse.data);
             localStorage.removeItem('token');
@@ -330,16 +341,12 @@ const UserProfilePage = () => {
                             <div className="row">
                                 <div className="col-md-4">
                                     <p>
-                                        <Link className='followersFollowingLink' to={`/${user.username}/followers`}>
-                                            <strong>{numFollowers}</strong> Followers
-                                        </Link>
+                                        <strong>{numFollowers}</strong> Followers
                                     </p>
                                 </div>
                                 <div className="col-md-4">
                                     <p>
-                                        <Link className='followersFollowingLink' to={`/${user.username}/following`}>
-                                            <strong>{user.followingCount}</strong> Following
-                                        </Link>
+                                        <strong>{user.followingCount}</strong> Following
                                     </p>
                                 </div>
                                 <div className="col-md-4">
@@ -357,14 +364,20 @@ const UserProfilePage = () => {
                                         Posts
                                     </a>
                                 </li>
-                                <li className="nav-item">
-                                    <a
-                                        className={`nav-link ${activeTab === 'timeline' ? 'active' : 'inactive'}`}
-                                        onClick={() => handleTabChange('timeline')}
-                                    >
-                                        Timeline
-                                    </a>
-                                </li>
+                                {
+                                    selfProfile ? (
+                                        <li className="nav-item">
+                                            <a
+                                                className={`nav-link ${activeTab === 'timeline' ? 'active' : 'inactive'}`}
+                                                onClick={() => handleTabChange('timeline')}
+                                            >
+                                                Timeline
+                                            </a>
+                                        </li>
+                                    ) : (
+                                        <div></div>
+                                    )
+                                }
                             </ul>
                             <div className="tab-content mt-3">
                                 {renderTabContent()}

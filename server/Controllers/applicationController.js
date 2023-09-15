@@ -58,8 +58,47 @@ const search_user = async (req, res) => {
     }
 }
 
+const get_timeline_tweets = async (req, res) => {
+    // Get the user's following array
+    const { username, token } = req.query;
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+
+    // Get the user's following array
+    const u = await user.findOne({ username: username });
+    const following = u.following;
+
+    // Get the tweets of all the users in the following array along with their username and name fields
+    const tweets = await user.find({ username: { $in: following } }, { username: 1, name: 1, tweets: 1 });
+
+    // Flatten the tweets array with the username and name fields
+    const timeline_tweets = [];
+    tweets.forEach((t) => {
+        t.tweets.forEach((tweet) => {
+            timeline_tweets.push({
+                username: t.username,
+                name: t.name,
+                content: tweet.content,
+                media: tweet.media,
+                date: tweet.date,
+                tweetId: tweet.tweetId,
+            });
+        });
+    });
+
+    // Sort the tweets by date
+    timeline_tweets.sort((a, b) => {
+        return b.date - a.date;
+    });
+
+    res.status(200).json({ tweets: timeline_tweets });
+}
+
 module.exports = {
     add_tweet,
     delete_tweet,
-    search_user
+    search_user,
+    get_timeline_tweets,
 }
