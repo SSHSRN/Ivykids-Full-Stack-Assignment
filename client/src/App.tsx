@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './App.css';
 import Homepage from './components/Homepage';
 import Profile from './components/Profile';
+import FollowersFollowing from "./components/FollowersFollowing";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/followersfollowing" element={<FollowersFollowing />} />
         </Routes>
       </BrowserRouter>
     </div>

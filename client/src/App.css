@@ -179,3 +179,17 @@
   background-color: rgb(29, 161, 242);
   cursor: pointer;
 }
+
+/* Followers following page styles */
+
+.followersFollowingPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  width: 100% !important;
+  background-color: black;
+  color: white;
+  margin: none !important;
+
+}
