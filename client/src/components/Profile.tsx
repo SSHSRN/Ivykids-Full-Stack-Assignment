@@ -446,7 +446,7 @@ const UserProfilePage = () => {
             <style>
                 {`
                     .modal-body textarea::placeholder {
-                        color: gray; /* Change this to your desired placeholder color */
+                        color: gray;
                     }
                 `}
             </style>
