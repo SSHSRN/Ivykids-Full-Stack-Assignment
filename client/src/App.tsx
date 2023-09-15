@@ -12,7 +12,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/user/*" element={<Profile />} />
           <Route path="/followersfollowing" element={<FollowersFollowing />} />
           <Route path="/search" element={<Explore />} />
         </Routes>

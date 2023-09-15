@@ -12,13 +12,27 @@ const sign_up = async (req, res) => {
         }
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        // create a string of the current month and year
+        const date = new Date();
+        const month = date.toLocaleString('default', { month: 'long' });
+        const year = date.getFullYear();
+        const joined = `${month} ${year}`;
+
         const newUser = new user({
             name,
             username,
             email,
             password: hashedPassword,
             accountCreated: Date.now(),
+            joined: joined,
             lastActive: Date.now(),
+            followersCount: 0,
+            followers: [],
+            followingCount: 0,
+            following: [],
+            tweetsCount: 0,
+            tweets: [],
+            token: '',
         });
         await newUser.save();
         res.status(201).send('User created successfully');
@@ -40,7 +54,7 @@ const login = async (req, res) => {
         }
 
         // Check the password
-        const passwordMatch = await bcrypt.compare(password, u.password);
+        const passwordMatch = bcrypt.compare(password, u.password);
 
         if (!passwordMatch) {
             return res.status(200).json({ message: 'Invalid credentials' });
@@ -52,14 +66,8 @@ const login = async (req, res) => {
         });
 
         // Update the last active field in the database
-        await user.updateOne({ _id: u._id }, { lastActive: Date.now() });
-        await user.updateOne({ _id: u._id }, { token });
-        await user.updateOne({ _id: u._id }, { followersCount: 0 });
-        await user.updateOne({ _id: u._id }, { followingCount: 0 });
-        await user.updateOne({ _id: u._id }, { followers: [] });
-        await user.updateOne({ _id: u._id }, { following: [] });
-        await user.updateOne({ _id: u._id }, { tweets: [] });
-        await user.updateOne({ _id: u._id }, { tweetsCount: 0 });
+        await user.updateOne({ username: u.username }, { lastActive: Date.now() });
+        await user.updateOne({ username: u.username }, { token: token });
         
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
@@ -84,8 +92,36 @@ const logout = async (req, res) => {
     }
 }
 
+const verify = async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Find the user by id
+        const u = await user.findOne({ _id: decoded.userId });
+
+        if (!u) {
+            return res.status(200).json({ message: 'Invalid token' });
+        }
+
+        // Check if the token is the same as the one in the database
+        if (u.token !== token) {
+            return res.status(200).json({ message: 'Invalid token' });
+        }
+
+        const { username, displayName, joined, followersCount, followers, followingCount, following, tweetsCount, tweets } = u;
+        res.status(200).json({ message: 'Valid token', user: { username, displayName, joined, followersCount, followers, followingCount, following, tweetsCount, tweets } });
+    } catch (error) {
+        console.error(error);
+        res.status(200).json({ message: 'Invalid token' });
+    }
+}
+
 module.exports = {
     sign_up,
     login,
     logout,
+    verify,
 }

@@ -6,7 +6,15 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     accountCreated: Date,
+    joined: String,
     lastActive: Date,
+    followersCount: Number,
+    followers: Array,
+    followingCount: Number,
+    following: Array,
+    tweetsCount: Number,
+    tweets: Array,
+    token: String,
 });
 
 const User = mongoose.model('User', userSchema);
