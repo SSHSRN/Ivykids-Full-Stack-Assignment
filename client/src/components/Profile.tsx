@@ -115,7 +115,7 @@ const UserProfilePage = () => {
                                 </div>
                                 {post.deletable && (
                                     <button
-                                        className="btn btn-sm btn-danger"
+                                        className="btn btn-sm btn-danger h-100 rounded-circle"
                                         onClick={() => {
                                             if (window.confirm('Are you sure you want to delete this post?')) {
                                                 handleDeletePost(post.id);
