@@ -176,7 +176,7 @@ const UserProfilePage = () => {
                                     {post.media && (
                                         <div>
                                             {post.media.type === 'image' && (
-                                                <img src={post.media.url} alt="Tweet Media" className="img-fluid" />
+                                                <img src={post.media.url} alt="Tweet Media" className="img-fluid tweetImg" />
                                             )}
                                             {post.media.type === 'video' && (
                                                 <video controls src={post.media.url} className="w-100" />
