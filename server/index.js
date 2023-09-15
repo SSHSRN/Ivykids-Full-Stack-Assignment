@@ -6,7 +6,7 @@ const cors = require('cors');
 app.use(express.json());
 
 // Configure CORS to allow only requests from localhost
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001']; // Add the frontend's URL
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'https://ivykids-full-stack-assignment-client-denf2do2wq-el.a.run.app']; // Add the frontend's URL
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
