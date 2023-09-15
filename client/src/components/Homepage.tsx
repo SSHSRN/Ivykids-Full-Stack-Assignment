@@ -1,11 +1,11 @@
-// Search for: #SSHSRNTODO
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 const Homepage = () => {
+    const navigate = useNavigate();
     const [showSignupModal, setShowSignupModal] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -79,7 +79,7 @@ const Homepage = () => {
         }
     }
 
-    const handleLogin = () => {
+    const handleLogin = async() => {
         const username = (document.getElementById('loginUsername') as HTMLInputElement).value;
         const password = (document.getElementById('loginPassword') as HTMLInputElement).value;
         // Check if all fields are filled and valid
@@ -97,7 +97,16 @@ const Homepage = () => {
         }
         const data = { username, password };
         console.log(data);
-        // Send data to server, validate and log in #SSHSRNTODO
+        const loginResponse = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/login', data);
+        console.log(loginResponse);
+        if(loginResponse.data.message === "Login successful") {
+            closeLoginModal();
+            navigate('/user/' + username);
+        }
+        else {
+            closeLoginModal();
+            alert('Login unsuccessful. Please try again.');
+        }
     }
 
     return (

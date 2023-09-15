@@ -1,5 +1,6 @@
 require("dotenv").config();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const user = require("../user");
 
 const sign_up = async (req, res) => {
@@ -27,6 +28,40 @@ const sign_up = async (req, res) => {
     }
 }
 
+const login = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Find the user by username
+        const u = await user.findOne({ username });
+
+        if (!u) {
+            return res.status(200).json({ message: 'Invalid credentials' });
+        }
+
+        // Check the password
+        const passwordMatch = await bcrypt.compare(password, u.password);
+
+        if (!passwordMatch) {
+            return res.status(200).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate a JWT token that expires in 10 minutes
+        const token = jwt.sign({ userId: u._id }, process.env.JWT_SECRET, {
+            expiresIn: '10m',
+        });
+
+        // Update the last active field in the database
+        await user.updateOne({ _id: u._id }, { lastActive: Date.now() });
+
+        res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 module.exports = {
     sign_up,
+    login,
 }
