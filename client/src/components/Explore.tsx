@@ -1,9 +1,62 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Explore = () => {
+    const [showRes, setShowRes] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
+    const [user, setUser] = useState({
+        username: '',
+        displayName: '',
+        joined: '',
+        followersCount: 0,
+        followers: [],
+        followingCount: 0,
+        following: [],
+        tweetsCount: 0,
+        tweets: []
+    });
+
+    // Check if user is logged in
+    useEffect(() => {
+        const checkLoggedIn = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+            }
+            else {
+                const response = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/verify', { token });
+                console.log(response.data);
+                if (response.data.message === 'Valid token') {
+                    console.log(response.data.user);
+                    setUser(response.data.user);
+                }
+                else {
+                    alert('You are either not logged in or your session has expired. Please log in again.');
+                    window.location.href = '/';
+                }
+            }
+        };
+        checkLoggedIn();
+    }, []);
+
+    const handleSearch = async () => {
+        const searchQuery = (document.querySelector('.form-control') as HTMLInputElement).value;
+        console.log(searchQuery);
+        const result = await axios.get(process.env.REACT_APP_SERVER_URL + '/application/search', {
+            params: {
+                username: searchQuery
+            }
+        });
+        console.log(result);
+        // render the results
+        setShowRes(true);
+        setSearchResults(result.data.users);
+
+    }
+
     return (
         <div className="bg-dark text-white min-vh-100 ExplorePage">
             <div className="container-fluid">
@@ -21,7 +74,7 @@ const Explore = () => {
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link left-link" to="/profile">
+                                <Link className="nav-link left-link" to={`/profile/${user.username}`}>
                                     <svg viewBox="0 0 24 24" width="26.25px" height="26.25px" fill="rgb(255,255,255)" className="sc-bcXHqe gBPObk mx-1">
                                         <g>
                                             <path d="M12 11.816c1.355 0 2.872-.15 3.84-1.256.814-.93 1.078-2.368.806-4.392-.38-2.825-2.117-4.512-4.646-4.512S7.734 3.343 7.354 6.17c-.272 2.022-.008 3.46.806 4.39.968 1.107 2.485 1.256 3.84 1.256zM8.84 6.368c.162-1.2.787-3.212 3.16-3.212s2.998 2.013 3.16 3.212c.207 1.55.057 2.627-.45 3.205-.455.52-1.266.743-2.71.743s-2.255-.223-2.71-.743c-.507-.578-.657-1.656-.45-3.205zm11.44 12.868c-.877-3.526-4.282-5.99-8.28-5.99s-7.403 2.464-8.28 5.99c-.172.692-.028 1.4.395 1.94.408.52 1.04.82 1.733.82h12.304c.693 0 1.325-.3 1.733-.82.424-.54.567-1.247.394-1.94zm-1.576 1.016c-.126.16-.316.246-.552.246H5.848c-.235 0-.426-.085-.552-.246-.137-.174-.18-.412-.12-.654.71-2.855 3.517-4.85 6.824-4.85s6.114 1.994 6.824 4.85c.06.242.017.48-.12.654z"></path>
@@ -40,12 +93,6 @@ const Explore = () => {
                                     <span className="mx-3">Explore</span>
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <button className="btn btn-primary btn-block mt-3 mx-3 w-75">Tweet</button>
-                            </li>
-                            <li className="nav-item">
-                                <button className="btn btn-outline-danger btn-block align-bottom mx-3 w-75" onClick={() => { if (window.confirm('Are you sure you want to log out?')) { window.location.href = '/'; } }}><strong>Log Out</strong></button>
-                            </li>
                         </ul>
                     </div>
                     <div className="col-md-10 pt-5">
@@ -54,13 +101,32 @@ const Explore = () => {
                                 <div className="input-group mb-3">
                                     <input type="text" className="form-control" placeholder="Search Twitter" aria-label="Search Twitter" aria-describedby="button-addon2" />
                                     <div className="input-group-append">
-                                        <button className="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+                                        <button className="btn btn-outline-secondary" type="button" id="button-addon2"
+                                            onClick={handleSearch}
+                                        >Search</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <h2 className="text-center mt-1">Search for users</h2>
-                        {/* Implement search functionality #SSHSRNTODO */}
+                        <h2 className={`text-center mt-1 ${showRes ? 'd-none' : 'd-block'}`} >Search for users</h2>
+                        <div className="row">
+                            {searchResults.map((user: any) => (
+                                <div className="col-11" key={user._id}>
+                                    <div className="card mb-4 bg-black text-white">
+                                        <div className="card-body bg-black text-white d-flex">
+                                            <img src="https://res.cloudinary.com/twitter-clone-media/image/upload/v1597737557/user_wt3nrc.png" className="smallProfilePic" alt="profile" />
+                                            <div className="d-block mx-3">
+                                                <h5 className="card-title">{user.name}</h5>
+                                                <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: 'white' }}>
+                                                    <p className="card-text">@{user.username}</p>
+                                                </Link>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
