@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Homepage = () => {
@@ -25,7 +26,7 @@ const Homepage = () => {
         setShowLoginModal(false);
     };
 
-    const handleSignUp = () => {
+    const handleSignUp = async() => {
         const name = (document.getElementById('signUpName') as HTMLInputElement).value;
         const username = (document.getElementById('signUpUsername') as HTMLInputElement).value;
         const email = (document.getElementById('signUpEmail') as HTMLInputElement).value;
@@ -63,7 +64,19 @@ const Homepage = () => {
         }
         const data = { name, username, email, password };
         console.log(data);
-        // Send data to server, validate and create account #SSHSRNTODO
+        console.log(process.env.REACT_APP_SERVER_URL);
+        const signUpResponse = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/signup', data);
+        console.log(signUpResponse);
+        if (signUpResponse.status === 201) {
+            alert('Account created Successfully. You can now log in with your username and password.');
+            closeSignupModal();
+        }
+        else if (signUpResponse.data === "Username already exists") {
+            alert('Username already exists. Use different credentials.');
+        }
+        else {
+            alert('Error creating account. Please try again.');
+        }
     }
 
     const handleLogin = () => {
