@@ -3,6 +3,7 @@ import './App.css';
 import Homepage from './components/Homepage';
 import Profile from './components/Profile';
 import FollowersFollowing from "./components/FollowersFollowing";
+import Explore from "./components/Explore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/followersfollowing" element={<FollowersFollowing />} />
+          <Route path="/search" element={<Explore />} />
         </Routes>
       </BrowserRouter>
     </div>
