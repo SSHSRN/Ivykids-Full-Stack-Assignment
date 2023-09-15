@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const UserProfilePage = () => {
     // profile data and timeline tweets are hardcoded for now, but will be fetched from the server #SSHSRNTODO
@@ -179,6 +180,16 @@ const UserProfilePage = () => {
         toggleTweetModal();
     }
 
+    const handleLogout = async() => {
+        if (window.confirm('Are you sure you want to log out?')) {
+            console.log('Logging out...');
+            const logoutResponse = await axios.post(process.env.REACT_APP_SERVER_URL + '/user/logout', {username: user.username});
+            console.log(logoutResponse.data);
+            localStorage.removeItem('token');
+            window.location.href = '/'; 
+        }
+    }
+
     return (
         <div className="bg-dark text-white min-vh-100">
             <div className="container-fluid">
@@ -208,7 +219,7 @@ const UserProfilePage = () => {
                                 <button className='btn btn-primary btn-block mt-3 mx-3 w-75' onClick={toggleTweetModal}>Tweet</button>
                             </li>
                             <li className="nav-item">
-                                <button className='btn btn-outline-danger btn-block align-bottom mx-3 w-75' onClick={() => { if (window.confirm('Are you sure you want to log out?')) { window.location.href = '/'; } }}><strong>Log Out</strong></button>
+                                <button className='btn btn-outline-danger btn-block align-bottom mx-3 w-75' onClick={handleLogout}><strong>Log Out</strong></button>
                             </li>
                         </ul>
                     </div>

@@ -53,15 +53,39 @@ const login = async (req, res) => {
 
         // Update the last active field in the database
         await user.updateOne({ _id: u._id }, { lastActive: Date.now() });
-
+        await user.updateOne({ _id: u._id }, { token });
+        await user.updateOne({ _id: u._id }, { followersCount: 0 });
+        await user.updateOne({ _id: u._id }, { followingCount: 0 });
+        await user.updateOne({ _id: u._id }, { followers: [] });
+        await user.updateOne({ _id: u._id }, { following: [] });
+        await user.updateOne({ _id: u._id }, { tweets: [] });
+        await user.updateOne({ _id: u._id }, { tweetsCount: 0 });
+        
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(200).json({ message: 'Internal Server Error' });
+    }
+}
+
+const logout = async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        console.log(username);
+
+        // Remove the token from the database
+        await user.updateOne({ username }, { token: '' });
+
+        res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+        console.error(error);
+        res.status(200).json({ message: 'Internal Server Error' });
     }
 }
 
 module.exports = {
     sign_up,
     login,
+    logout,
 }

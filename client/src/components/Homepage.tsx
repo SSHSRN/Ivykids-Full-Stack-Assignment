@@ -101,6 +101,7 @@ const Homepage = () => {
         console.log(loginResponse);
         if(loginResponse.data.message === "Login successful") {
             closeLoginModal();
+            localStorage.setItem('token', loginResponse.data.token);
             navigate('/user/' + username);
         }
         else {
