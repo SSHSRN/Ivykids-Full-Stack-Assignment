@@ -96,7 +96,7 @@ const UserProfilePage = () => {
                                 user: tweet.user,
                                 name: tweet.name
                             }
-                        }).reverse();
+                        });
                         setTimelinePosts(timelinePosts);
                     }
                     else if (response.data.user.username !== window.location.pathname.split('/')[2]) {
