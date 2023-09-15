@@ -48,7 +48,6 @@ const delete_tweet = async (req, res) => {
 const search_user = async (req, res) => {
     try {
         const { username } = req.query;
-        console.log("username: ", username);
         // query the database for users with the username and similar usernames. Get the username and name fields of the matched users
         const users = await user.find({ username: { $regex: username, $options: 'i' } }, { username: 1, name: 1 });
         res.status(200).json({ users: users });
